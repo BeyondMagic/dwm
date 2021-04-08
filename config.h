@@ -57,15 +57,19 @@ static const char *altbarcmd        = "dont_run"; // Alternate bar launch comman
 
 
 static const char col_dump[]            = "#222222";
-static const char til_border_normal[]   = "#444444";
-static const char til_border_selected[] = "#bbbbbb";
-static const char flo_border_normal[]   = "#eeeeee";
-static const char flo_border_selected[] = "#005577";
+
+static const char col_flo_sel[]         = "#7394D3"; // Selected Floating Windows
+static const char col_flo_non[]         = "#44ff88"; // Floating Windows
+
+static const char col_til_sel[]         = "#ffffff"; // Selected Floating Windows
+static const char col_til_non[]         = "#FF0000"; // Floating Windows
 
 static const char *colors[][4]      = {
-  /*               fg        bg        border               float */
-	[SchemeNorm] = { col_dump, col_dump, til_border_normal,   flo_border_normal   },
-	[SchemeSel] =  { col_dump, col_dump, til_border_selected, flo_border_selected },
+
+  /*             fg          bg        border      */
+	[SchemeNorm] = { col_dump, col_dump, col_flo_sel, col_til_non },
+	[SchemeSel] =  { col_dump, col_dump, col_til_sel, col_flo_non },
+
 };
 
 /****************************************************************************************
