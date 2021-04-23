@@ -11,18 +11,18 @@
  ****************************************************************************************/
 
 
-static const unsigned int borderpx  = 3;    // border pixel of windows
+static const unsigned int borderpx  = 1;    // border pixel of windows
 static const unsigned int snap      = 3;    // snap pixel
 static const int extrabarright      = 0;    // 1 means extra bar text on right */
 static const char statussep         = ';';  // separator between status bars */
 static const int showbar            = 1;    // 0 means no bar
 static const int topbar             = 1;    // 0 means bottom bar
 static const int focusonwheel       = 1;    // focus on click or sloppy
-static const unsigned int gappih   = 30;    // horiz inner gap between windows
-static const unsigned int gappiv   = 30;    // vert inner gap between windows
-static const unsigned int gappoh   = 25;    // horiz outer gap between windows and screen edge
-static const unsigned int gappov   = 30;    // vert outer gap between windows and screen edge
-static       int smartgaps         = 0;     // 1 means no outer gap when there is only one window
+static const unsigned int gappih    = 30;    // horiz inner gap between windows
+static const unsigned int gappiv    = 30;    // vert inner gap between windows
+static const unsigned int gappoh    = 25;    // horiz outer gap between windows and screen edge
+static const unsigned int gappov    = 30;    // vert outer gap between windows and screen edge
+static       int smartgaps          = 0;     // 1 means no outer gap when there is only one window
 
 
 
@@ -34,7 +34,15 @@ static       int smartgaps         = 0;     // 1 means no outer gap when there i
 static const MonitorRule monrules[] = {
 
   /*mon  tag  layout  mfact  nmaster  showbar  topbar */
-	{  1,   -1,  2,      -1,    -1,      -1,      -1     }, // use a different layout
+//	{  -1,   1,  1,      -1,    -1,      -1,      -1     }, // use a different layout
+//	{  -1,   2,  2,      -1,    -1,      -1,      -1     }, // use a different layout
+	{  -1,   3,  3,      -1,    -1,      -1,      -1     }, // use a different layout
+	{  -1,   4,  4,      -1,    -1,      -1,      -1     }, // use a different layout
+//	{  -1,   5,  5,      -1,    -1,      -1,      -1     }, // use a different layout
+	{  -1,   6,  6,      -1,    -1,      -1,      -1     }, // use a different layout
+	{  -1,   7,  7,      -1,    -1,      -1,      -1     }, // use a different layout
+	{  -1,   8,  8,      -1,    -1,      -1,      -1     }, // use a different layout
+
 	{  -1,  -1,  0,      -1,    -1,      -1,      -1     }, // default
 
 };
@@ -58,11 +66,11 @@ static const char *altbarcmd        = "dont_run"; // Alternate bar launch comman
 
 static const char col_dump[]            = "#222222";
 
-static const char col_flo_sel[]         = "#7394D3"; // Selected Floating Windows
-static const char col_flo_non[]         = "#44ff88"; // Floating Windows
+static const char col_flo_sel[]         = "#62A6C3"; // Selected Floating Windows
+static const char col_flo_non[]         = "#395182"; // Floating Windows
 
-static const char col_til_sel[]         = "#ffffff"; // Selected Floating Windows
-static const char col_til_non[]         = "#FF0000"; // Floating Windows
+static const char col_til_sel[]         = "#323234"; // Selected Floating Windows
+static const char col_til_non[]         = "#131115"; // Floating Windows
 
 static const char *colors[][4]      = {
 
@@ -108,14 +116,132 @@ static const Rule rules[] = {
 	 *	WM_NAME(STRING) = title
 	 */
   
-	/* class      instance    title       tags mask     isfloating   monitor */
-	{ "mpv",      NULL,       NULL,       0,            1,           -1 },
-	{ "Firefox",  NULL,       NULL,       1,            0,           -1 },
-	{ "Gimp",     NULL,       NULL,       5,            0,           -1 },
-	{ "Gcolor2",  NULL,       NULL,       1,            0,           -1 },
-	{ "Visualboyadvance-m", NULL, NULL,   0,            1,           -1 },
-	{ NULL,       NULL,       "floatst",  0,            1,           -1 },
-	{ NULL, NULL, "XBindKey: Hit a key",  0,            1,           -1 },
+	// class
+	{ "mpv",
+    //instance
+    NULL,
+    // title
+    NULL,
+    // tags mask
+    3,
+    // isfloating
+    1,
+    // monitor
+    -1 },
+
+	// class
+	{ "Dunst",
+    //instance
+    NULL,
+    // title
+    NULL,
+    // tags mask
+    0,
+    // isfloating
+    1,
+    // monitor
+    -1 },
+
+	// class
+	{ "firefox",
+    //instance
+    NULL,
+    // title
+    NULL,
+    // tags mask
+    1,
+    // isfloating
+    0,
+    // monitor
+    -1 },
+	// class
+	{ "Gimp",
+    //instance
+    NULL,
+    // title
+    NULL,
+    // tags mask
+    7,
+    // isfloating
+    0,
+    // monitor
+    -1 },
+	// class
+	{ "Gcolor2",
+    //instance
+    NULL,
+    // title
+    NULL,
+    // tags mask
+    0,
+    // isfloating
+    0,
+    // monitor
+    -1 },
+	// class
+	{ "Visualboyadvance-m",
+    //instance
+    NULL,
+    // title
+    NULL,
+    // tags mask
+    5,
+    // isfloating
+    1,
+    // monitor
+    -1 },
+	// class
+	{ "qBittorrent",
+    //instance
+    NULL,
+    // title
+    NULL,
+    // tags mask
+    6,
+    // isfloating
+    1,
+    // monitor
+    -1 },
+	// class
+	{ NULL,
+    //instance
+    NULL,
+    // title
+    "floatst",
+    // tags mask
+    0,
+    // isfloating
+    1,
+    // monitor
+    -1 },
+
+	// class
+	{ NULL,
+    //instance
+    NULL,
+    // title
+    "XBindKey: Hit a key",
+    // tags mask
+    0,
+    // isfloating
+    1,
+    // monitor
+    -1 },
+
+	// class
+	{ "TelegramDesktop",
+    //instance
+    NULL,
+    // title
+    NULL,
+    // tags mask
+    9,
+    // isfloating
+    1,
+    // monitor
+    -1 },
+
+
 
 };
 
@@ -225,13 +351,11 @@ static Key keys[] = {
 
 //	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
 	{ MODKEY,                       XK_Return, spawn,          {.v = termcmd } },
-	{ MODKEY,                       XK_b,      togglebar,      {0} },
-	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
-	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },
+//	{ MODKEY,                       XK_b,      togglebar,      {0} },
 	{ MODKEY,                       XK_o,      incnmaster,     {.i = +1 } },
 	{ MODKEY|ShiftMask,             XK_o,      incnmaster,     {.i = -1 } },
-	{ MODKEY,                       XK_h,      setmfact,       {.f = -0.05} },
-	{ MODKEY,                       XK_l,      setmfact,       {.f = +0.05} },
+	{ MODKEY,                       XK_h,      setmfact,       {.f = -0.01} },
+	{ MODKEY,                       XK_l,      setmfact,       {.f = +0.01} },
 	{ MODKEY,                       XK_space,  zoom,           {0} },
 	{ MODKEY,                    XK_backslash, view,           {0} },
 	{ MODKEY,                       XK_q,      killclient,     {0} },
@@ -263,37 +387,36 @@ static Key keys[] = {
 //	{ MODKEY,             XK_j,      movestack,      {.i = +1 } },
 //	{ MODKEY,             XK_k,      movestack,      {.i = -1 } },
 
+	{ MODKEY,                       XK_j,      focusstack,     {.i = +1 } },
+	{ MODKEY,                       XK_k,      focusstack,     {.i = -1 } },
+
    /****************************************************************************************
    * Layout  
    *****************************************************************************************/
 
 
-	{ MODKEY|ShiftMask,             XK_space,  togglefloating, {0} },
-
-  { MODKEY,			        XK_t,		setlayout,	{.v = &layouts[0]} }, // tile                   : Super     +     t 
-  { MODKEY|ShiftMask,		XK_t,		setlayout,	{.v = &layouts[1]} }, // bstack                 : Super + Shift + T
-  { MODKEY,			        XK_y,		setlayout,	{.v = &layouts[2]} }, // spiral                 : Super     +     y
-  { MODKEY|ShiftMask,		XK_y,		setlayout,	{.v = &layouts[3]} }, // dwindle                : Super + Shift + Y
-  { MODKEY,			        XK_u,		setlayout,	{.v = &layouts[4]} }, // deck                   : Super     +     u
-  { MODKEY|ShiftMask,		XK_u,		setlayout,	{.v = &layouts[5]} }, // monocle                : Super + Shift + U
-  { MODKEY,		        	XK_i,		setlayout,	{.v = &layouts[6]} }, // centeredmaster         : Super     +     I
-  { MODKEY|ShiftMask,		XK_i,		setlayout,	{.v = &layouts[7]} }, // centeredfloatingmaster : Super + Shift + i
+	{ MODKEY|ShiftMask,           XK_space,  togglefloating, {0} },
+  { MODKEY,			        XK_t,		setlayout,	{.v = &layouts[0]} },   // tile                   : Super     +     t 
+  { MODKEY|ShiftMask,		XK_t,		setlayout,	{.v = &layouts[1]} },   // bstack                 : Super + Shift + T
+  { MODKEY,			        XK_y,		setlayout,	{.v = &layouts[2]} },   // spiral                 : Super     +     y
+  { MODKEY|ShiftMask,		XK_y,		setlayout,	{.v = &layouts[3]} },   // dwindle                : Super + Shift + Y
+  { MODKEY,			        XK_u,		setlayout,	{.v = &layouts[4]} },   // deck                   : Super     +     u
+  { MODKEY|ShiftMask,		XK_u,		setlayout,	{.v = &layouts[5]} },   // monocle                : Super + Shift + U
+  { MODKEY,		        	XK_i,		setlayout,	{.v = &layouts[6]} },   // centeredmaster         : Super     +     I
+  { MODKEY|ShiftMask,		XK_i,		setlayout,	{.v = &layouts[7]} },   // centeredfloatingmaster : Super + Shift + i
 	{ MODKEY|ControlMask, XK_period, cyclelayout,     {.i = +1 } },
 
 
    /****************************************************************************************
    * Patches
    *   actualfullcreen
-   *   alwaysontop : thinking
    *   sticky
    ****************************************************************************************/
 
 
 	{ MODKEY,                       XK_f,      togglefullscr,     {0} }, // dwm-actualfullscreen
-//{ MODKEY|ShiftMask,             XK_space,  togglealwaysontop, {0} }, // dwm-alwaysontop
 	{ MODKEY,                       XK_s,      togglesticky,   {0} },
 //	{ MODKEY,                       XK_m,      swapfocus,      {0} },
-
 
 
 
