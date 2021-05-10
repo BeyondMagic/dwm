@@ -123,9 +123,11 @@ static const Rule rules[] = {
     // title
     NULL,
     // tags mask
-    3,
+    4,
     // isfloating
-    1,
+    0,
+    // isalwaysontop
+    0,
     // monitor
     -1 },
 
@@ -138,6 +140,8 @@ static const Rule rules[] = {
     // tags mask
     0,
     // isfloating
+    1,
+    // isalwaysontop
     1,
     // monitor
     -1 },
@@ -152,6 +156,8 @@ static const Rule rules[] = {
     1,
     // isfloating
     0,
+    // isalwaysontop
+    0,
     // monitor
     -1 },
 	// class
@@ -161,8 +167,10 @@ static const Rule rules[] = {
     // title
     NULL,
     // tags mask
-    7,
+    128,
     // isfloating
+    0,
+    // isalwaysontop
     0,
     // monitor
     -1 },
@@ -176,6 +184,8 @@ static const Rule rules[] = {
     0,
     // isfloating
     0,
+    // isalwaysontop
+    0,
     // monitor
     -1 },
 	// class
@@ -185,9 +195,11 @@ static const Rule rules[] = {
     // title
     NULL,
     // tags mask
-    5,
+    32,
     // isfloating
     1,
+    // isalwaysontop
+    0,
     // monitor
     -1 },
 	// class
@@ -197,9 +209,11 @@ static const Rule rules[] = {
     // title
     NULL,
     // tags mask
-    6,
+    64,
     // isfloating
     1,
+    // isalwaysontop
+    0,
     // monitor
     -1 },
 	// class
@@ -212,6 +226,8 @@ static const Rule rules[] = {
     0,
     // isfloating
     1,
+    // isalwaysontop
+    0,
     // monitor
     -1 },
 
@@ -225,6 +241,8 @@ static const Rule rules[] = {
     0,
     // isfloating
     1,
+    // isalwaysontop
+    0,
     // monitor
     -1 },
 
@@ -235,9 +253,11 @@ static const Rule rules[] = {
     // title
     NULL,
     // tags mask
-    9,
+    256,
     // isfloating
-    1,
+    0,
+    // isalwaysontop
+    0,
     // monitor
     -1 },
 
@@ -347,6 +367,7 @@ static Key keys[] = {
 	  TAGKEYS(			              XK_7,		6)
 	  TAGKEYS(			              XK_8,		7)
 	  TAGKEYS(			              XK_9,		8)
+	  TAGKEYS(			              XK_m,		7)
 
 
 //	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
@@ -426,8 +447,8 @@ static Key keys[] = {
 
 
 
-	{ MODKEY,			                  XK_a,	     togglegaps,	   {0} },
-	{ MODKEY|ShiftMask,		          XK_a,		   defaultgaps,	   {0} },
+//	{ MODKEY,			                  XK_a,	     togglegaps,	   {0} },
+//	{ MODKEY|ShiftMask,		          XK_a,		   defaultgaps,	   {0} },
 	{ MODKEY,                 			XK_v,		   incrgaps,	     {.i = +3 } },
 	{ MODKEY,			                  XK_z,		   incrgaps,	     {.i = -3 } },
 /*	{ MODKEY|Mod4Mask,            XK_u,      incrgaps,       {.i = +1 } },
@@ -476,7 +497,7 @@ static Key keys[] = {
    ****************************************************************************************/
 
 
-	{ MODKEY,			XK_d,		spawn,          SHCMD("dmenu_run") },
+	{ MODKEY,			XK_d,		spawn,          SHCMD("dmenu_run -r -i") },
 	{ MODKEY,			XK_comma,	spawn,		SHCMD("mpc prev") },
 	{ MODKEY,			XK_period,	spawn,		SHCMD("mpc next") },
   { MODKEY|ShiftMask,		XK_period,	spawn,		SHCMD("mpc repeat") },

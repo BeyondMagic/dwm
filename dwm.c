@@ -54,7 +54,7 @@
                                * MAX(0, MIN((y)+(h),(m)->my+(m)->mh) - MAX((y),(m)->my)))
 #define ISINC(X)                ((X) > 1000 && (X) < 3000)
 //#define ISVISIBLE(C)          ((C->tags & C->mon->tagset[C->mon->seltags]))
-#define ISVISIBLE(C)            ((C->tags & C->mon->tagset[C->mon->seltags]) || C->issticky)
+#define ISVISIBLE(C)            ((C->tags & C->mon->tagset[C->mon->seltags]) || C->issticky || C->isalwaysontop)
 #define PREVSEL                 3000
 #define LENGTH(X)               (sizeof X / sizeof X[0])
 #define MOD(N,M)                ((N)%(M) < 0 ? (N)%(M) + (M) : (N)%(M))
@@ -115,7 +115,8 @@ struct Client {
 	int bw, oldbw;
 	unsigned int tags;
 //	int isfixed, isfloating, isurgent, neverfocus, oldstate, isfullscreen;
-  int isfixed, isfloating, isurgent, neverfocus, oldstate, isfullscreen, issticky;
+  int isfixed, isfloating, isurgent, neverfocus, oldstate, isfullscreen,
+      issticky, isalwaysontop;
 	Client *next;
 	Client *snext;
 	Monitor *mon;
@@ -174,6 +175,7 @@ typedef struct {
 	const char *title;
 	unsigned int tags;
 	int isfloating;
+  int isalwaysontop;
 	int monitor;
 } Rule;
 
@@ -276,6 +278,7 @@ static void tagmon(const Arg *arg);
 //static void tile(Monitor *);
 static void togglebar(const Arg *arg);
 static void togglefloating(const Arg *arg);
+//static void togglealwaysontop(const Arg *arg);
 static void togglefullscr(const Arg *arg); // dwm-actualfullscreen
 static void togglesticky(const Arg *arg);
 static void toggletag(const Arg *arg);
@@ -378,6 +381,7 @@ applyrules(Client *c)
 
 	/* rule matching */
 	c->isfloating = 0;
+  c->isalwaysontop = 0;
 	c->tags = 0;
 	XGetClassHint(dpy, c->win, &ch);
 	class    = ch.res_class ? ch.res_class : broken;
@@ -390,6 +394,7 @@ applyrules(Client *c)
 		&& (!r->instance || strstr(instance, r->instance)))
 		{
 			c->isfloating = r->isfloating;
+      c->isalwaysontop = r->isalwaysontop;
 			c->tags |= r->tags;
 			for (m = mons; m && m->num != r->monitor; m = m->next);
 			if (m)
@@ -926,8 +931,11 @@ drawbar(Monitor *m)
 		if (m->sel) {
 			drw_setscheme(drw, scheme[m == selmon ? SchemeSel : SchemeNorm]);
 			drw_text(drw, x, 0, w, bh, lrpad / 2, m->sel->name, 0);
-			if (m->sel->isfloating)
+			if (m->sel->isfloating) {
 				drw_rect(drw, x + boxs, boxs, boxw, boxw, m->sel->isfixed, 0);
+				if (m->sel->isalwaysontop)
+					drw_rect(drw, x + boxs, bh - boxw, boxw, boxw, 0, 0);
+      }
 		} else {
 			drw_setscheme(drw, scheme[SchemeNorm]);
 			drw_rect(drw, x, 0, w, bh, 1, 1);
@@ -1730,10 +1738,12 @@ pushstack(const Arg *arg) {
 
 void
 pushdown(const Arg *arg) {
-	Client *sel = selmon->sel, *c;
+  Client *sel = selmon->sel, *c;
 
-	if(!sel || sel->isfloating)
+	if(!sel)
 		return;
+  if (sel->isfloating)
+    XRaiseWindow(dpy, sel->win);
 	if((c = nexttiled(sel->next))) {
 		detach(sel);
 		sel->next = c->next;
@@ -1896,8 +1906,24 @@ restack(Monitor *m)
 	drawbar(m);
 	if (!m->sel)
 		return;
-	if (m->sel->isfloating || !m->lt[m->sellt]->arrange)
+
+  //	if (m->sel->isfloating || !m->lt[m->sellt]->arrange)
+  if (!m->lt[m->sellt]->arrange)
 		XRaiseWindow(dpy, m->sel->win);
+
+  // create rule to always activate Dunst on the top
+  //  XRaiseWindow(dpy, m->sel->win);
+
+	/* raise the aot window */
+	for(Monitor *m_search = mons; m_search; m_search = m_search->next){
+		for(c = m_search->clients; c; c = c->next){
+			if (c->isalwaysontop) {
+				XRaiseWindow(dpy, c->win);
+				break;
+			}
+		}
+	}
+
 	if (m->lt[m->sellt]->arrange) {
 		wc.stack_mode = Below;
 		wc.sibling = m->barwin;
@@ -2416,9 +2442,32 @@ togglefloating(const Arg *arg)
 		selmon->sel->sfy = selmon->sel->y;
 		selmon->sel->sfw = selmon->sel->w;
 		selmon->sel->sfh = selmon->sel->h;
+//    selmon->sel->isalwaysontop = 0; /* disabled, turn this off too */
   }
 	arrange(selmon);
 }
+
+/*void
+togglealwaysontop(const Arg *arg)
+{
+	if (!selmon->sel)
+		return;
+	if (selmon->sel->isfullscreen)
+		return;
+
+	if(selmon->sel->isalwaysontop){
+		selmon->sel->isalwaysontop = 0;
+	}else{
+		// disable others
+		for(Monitor *m = mons; m; m = m->next)
+			for(Client *c = m->clients; c; c = c->next)
+				c->isalwaysontop = 0;
+
+		// turn on, make it float too
+//		selmon->sel->isfloating = 1;
+		selmon->sel->isalwaysontop = 1;
+  }
+}*/
 
 void
 togglefullscr(const Arg *arg)
