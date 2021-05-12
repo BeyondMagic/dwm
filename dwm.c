@@ -41,6 +41,12 @@
 #include <X11/extensions/Xinerama.h>
 #endif /* XINERAMA */
 #include <X11/Xft/Xft.h>
+#include <X11/Xlib-xcb.h>
+#include <xcb/res.h>
+#ifdef __OpenBSD__
+#include <sys/sysctl.h>
+#include <kvm.h>
+#endif /* __OpenBSD */
 
 #include "drw.h"
 #include "util.h"
@@ -117,6 +123,7 @@ struct Client {
 //	int isfixed, isfloating, isurgent, neverfocus, oldstate, isfullscreen;
   int isfixed, isfloating, isurgent, neverfocus, oldstate, isfullscreen,
       issticky, isalwaysontop;
+  pid_t pid;
 	Client *next;
 	Client *snext;
 	Monitor *mon;
@@ -220,6 +227,7 @@ static void focus(Client *c);
 static void focusin(XEvent *e);
 static void focusmon(const Arg *arg);
 static void focusstack(const Arg *arg);
+static pid_t getparentprocess(pid_t p);
 static Atom getatomprop(Client *c, Atom prop);
 static int getrootptr(int *x, int *y);
 static long getstate(Window w);
@@ -228,6 +236,7 @@ static void grabbuttons(Client *c, int focused);
 static void grabkeys(void);
 static int handlexevent(struct epoll_event *ev);
 static void incnmaster(const Arg *arg);
+static int isdescprocess(pid_t p, pid_t c);
 static void keypress(XEvent *e);
 static void killclient(const Arg *arg);
 static void manage(Window w, XWindowAttributes *wa);
@@ -252,6 +261,10 @@ static void resize(Client *c, int x, int y, int w, int h, int interact);
 static void resizeclient(Client *c, int x, int y, int w, int h);
 static void resizemouse(const Arg *arg);
 static void restack(Monitor *m);
+static int riodraw(Client *c, const char slopstyle[]);
+static void rioposition(Client *c, int x, int y, int w, int h);
+static void rioresize(const Arg *arg);
+static void riospawn(const Arg *arg);
 static void run(void);
 static void scan(void);
 static int sendevent(Client *c, Atom proto);
@@ -270,6 +283,8 @@ static void sigchld(int unused);
 static void sighup(int unused);
 static void sigterm(int unused);
 static void spawn(const Arg *arg);
+static pid_t spawncmd(const Arg *arg);
+static void switchcol(const Arg *arg);
 static int stackpos(const Arg *arg);
 //static void swapfocus();
 static void spawnbar();
@@ -298,6 +313,7 @@ static void updatetitle(Client *c);
 static void updatewindowtype(Client *c);
 static void updatewmhints(Client *c);
 static void view(const Arg *arg);
+static pid_t winpid(Window w);
 static Client *wintoclient(Window w);
 static Monitor *wintomon(Window w);
 static int wmclasscontains(Window win, const char *class, const char *name);
@@ -317,6 +333,8 @@ static int bh, blw = 0;      /* bar geometry */
 static int lrpad;            /* sum of left and right padding for text */
 static int (*xerrorxlib)(Display *, XErrorEvent *);
 static unsigned int numlockmask = 0;
+static int riodimensions[4] = { -1, -1, -1, -1 };
+static pid_t riopid = 0;
 static void (*handler[LASTEvent]) (XEvent *) = {
 	[ButtonPress] = buttonpress,
 	[ClientMessage] = clientmessage,
@@ -344,6 +362,7 @@ static Display *dpy;
 static Drw *drw;
 static Monitor *mons, *selmon, *lastselmon;
 static Window root, wmcheckwin;
+static xcb_connection_t *xcon;
 
 #include "ipc.h"
 
@@ -1126,6 +1145,39 @@ getatomprop(Client *c, Atom prop)
 	return atom;
 }
 
+pid_t
+getparentprocess(pid_t p)
+{
+	unsigned int v = 0;
+
+#ifdef __linux__
+	FILE *f;
+	char buf[256];
+	snprintf(buf, sizeof(buf) - 1, "/proc/%u/stat", (unsigned)p);
+
+	if (!(f = fopen(buf, "r")))
+		return 0;
+
+	fscanf(f, "%*u %*s %*c %u", &v);
+	fclose(f);
+#endif /* __linux__*/
+
+#ifdef __OpenBSD__
+	int n;
+	kvm_t *kd;
+	struct kinfo_proc *kp;
+
+	kd = kvm_openfiles(NULL, NULL, NULL, KVM_NO_FILES, NULL);
+	if (!kd)
+		return 0;
+
+	kp = kvm_getprocs(kd, KERN_PROC_PID, p, sizeof(*kp), &n);
+	v = kp->p_ppid;
+#endif /* __OpenBSD__ */
+
+	return (pid_t)v;
+}
+
 int
 getrootptr(int *x, int *y)
 {
@@ -1245,6 +1297,16 @@ incnmaster(const Arg *arg)
 	arrange(selmon);
 }
 
+
+int
+isdescprocess(pid_t p, pid_t c)
+{
+	while (p != c && c != 0)
+		c = getparentprocess(c);
+
+	return (int)c;
+}
+
 #ifdef XINERAMA
 static int
 isuniquegeom(XineramaScreenInfo *unique, size_t n, XineramaScreenInfo *info)
@@ -1298,6 +1360,7 @@ manage(Window w, XWindowAttributes *wa)
 
 	c = ecalloc(1, sizeof(Client));
 	c->win = w;
+  c->pid = winpid(w);
 	/* geometry */
 	c->x = c->oldx = wa->x;
 	c->y = c->oldy = wa->y;
@@ -1358,6 +1421,16 @@ manage(Window w, XWindowAttributes *wa)
 	if (c->mon == selmon)
 		unfocus(selmon->sel, 0);
 	c->mon->sel = c;
+
+	if (riopid && (!riodraw_matchpid || isdescprocess(riopid, c->pid))) {
+		if (riodimensions[3] != -1)
+			rioposition(c, riodimensions[0], riodimensions[1], riodimensions[2], riodimensions[3]);
+		else {
+			killclient(&((Arg) { .v = c }));
+			return;
+		}
+	}
+
 	arrange(c->mon);
 	XMapWindow(dpy, c->win);
 	focus(NULL);
@@ -1937,6 +2010,107 @@ restack(Monitor *m)
 	while (XCheckMaskEvent(dpy, EnterWindowMask, &ev));
 }
 
+
+int
+riodraw(Client *c, const char slopstyle[])
+{
+	int i;
+	char str[100] = {0};
+	char strout[100] = {0};
+	char tmpstring[30] = {0};
+	char slopcmd[100] = "slop -f x%xx%yx%wx%hx ";
+	int firstchar = 0;
+	int counter = 0;
+
+	strcat(slopcmd, slopstyle);
+	FILE *fp = popen(slopcmd, "r");
+
+	while (fgets(str, 100, fp) != NULL)
+		strcat(strout, str);
+
+	pclose(fp);
+
+	if (strlen(strout) < 6)
+		return 0;
+
+	for (i = 0; i < strlen(strout); i++){
+		if (!firstchar) {
+			if (strout[i] == 'x')
+				firstchar = 1;
+			continue;
+		}
+
+		if (strout[i] != 'x')
+			tmpstring[strlen(tmpstring)] = strout[i];
+		else {
+			riodimensions[counter] = atoi(tmpstring);
+			counter++;
+			memset(tmpstring,0,strlen(tmpstring));
+		}
+	}
+
+	if (riodimensions[0] <= -40 || riodimensions[1] <= -40 || riodimensions[2] <= 50 || riodimensions[3] <= 50) {
+		riodimensions[3] = -1;
+		return 0;
+	}
+
+	if (c) {
+		rioposition(c, riodimensions[0], riodimensions[1], riodimensions[2], riodimensions[3]);
+		return 0;
+	}
+
+	return 1;
+}
+
+void
+rioposition(Client *c, int x, int y, int w, int h)
+{
+	Monitor *m;
+	if ((m = recttomon(x, y, w, h)) && m != c->mon) {
+		detach(c);
+		detachstack(c);
+		arrange(c->mon);
+		c->mon = m;
+		c->tags = m->tagset[m->seltags];
+		attach(c);
+		attachstack(c);
+		selmon = m;
+		focus(c);
+	}
+
+	c->isfloating = 1;
+	if (riodraw_borders)
+		resizeclient(c, x, y, w - (c->bw * 2), h - (c->bw * 2));
+	else
+		resizeclient(c, x - c->bw, y - c->bw, w, h);
+	arrange(c->mon);
+
+	riodimensions[3] = -1;
+	riopid = 0;
+}
+
+/* drag out an area using slop and resize the selected window to it */
+void
+rioresize(const Arg *arg)
+{
+	Client *c = (arg && arg->v ? (Client*)arg->v : selmon->sel);
+	if (c)
+		riodraw(c, slopresizestyle);
+}
+
+/* spawn a new window and drag out an area using slop to position it */
+void
+riospawn(const Arg *arg)
+{
+	if (riodraw_spawnasync) {
+		riopid = spawncmd(arg);
+		riodraw(NULL, slopspawnstyle);
+	} else if (riodraw(NULL, slopspawnstyle))
+		riopid = spawncmd(arg);
+}
+
+
+
 void
 run(void)
 {
@@ -2304,7 +2478,17 @@ spawn(const Arg *arg)
 {
 //	if (arg->v == dmenucmd)
 //		dmenumon[0] = '0' + selmon->num;
-	if (fork() == 0) {
+//
+	spawncmd(arg);
+}
+
+pid_t
+spawncmd(const Arg *arg)
+{
+	pid_t pid;
+//
+//	if (fork() == 0) {
+	if ((pid = fork()) == 0) {
 		if (dpy)
 			close(ConnectionNumber(dpy));
 		setsid();
@@ -2312,6 +2496,37 @@ spawn(const Arg *arg)
 		fprintf(stderr, "dwm: execvp %s", ((char **)arg->v)[0]);
 		perror(" failed");
 		exit(EXIT_SUCCESS);
+	}
+  return pid;
+}
+
+
+void
+switchcol(const Arg *arg)
+{
+	Client *c, *t;
+	int col = 0;
+	int i;
+
+	if (!selmon->sel)
+		return;
+	for (i = 0, c = nexttiled(selmon->clients); c ;
+	     c = nexttiled(c->next), i++) {
+		if (c == selmon->sel)
+			col = (i + 1) > selmon->nmaster;
+	}
+	if (i <= selmon->nmaster)
+		return;
+	for (c = selmon->stack; c; c = c->snext) {
+		if (!ISVISIBLE(c))
+			continue;
+		for (i = 0, t = nexttiled(selmon->clients); t && t != c;
+		     t = nexttiled(t->next), i++);
+		if (t && (i + 1 > selmon->nmaster) != col) {
+			focus(c);
+			restack(selmon);
+			break;
+		}
 	}
 }
 
@@ -2923,6 +3138,60 @@ view(const Arg *arg)
 	arrange(selmon);
 }
 
+
+pid_t
+winpid(Window w)
+{
+	pid_t result = 0;
+
+#ifdef __linux__
+	xcb_res_client_id_spec_t spec = {0};
+	spec.client = w;
+	spec.mask = XCB_RES_CLIENT_ID_MASK_LOCAL_CLIENT_PID;
+
+	xcb_generic_error_t *e = NULL;
+	xcb_res_query_client_ids_cookie_t c = xcb_res_query_client_ids(xcon, 1, &spec);
+	xcb_res_query_client_ids_reply_t *r = xcb_res_query_client_ids_reply(xcon, c, &e);
+
+	if (!r)
+		return (pid_t)0;
+
+	xcb_res_client_id_value_iterator_t i = xcb_res_query_client_ids_ids_iterator(r);
+	for (; i.rem; xcb_res_client_id_value_next(&i)) {
+		spec = i.data->spec;
+		if (spec.mask & XCB_RES_CLIENT_ID_MASK_LOCAL_CLIENT_PID) {
+			uint32_t *t = xcb_res_client_id_value_value(i.data);
+			result = *t;
+			break;
+		}
+	}
+
+	free(r);
+
+	if (result == (pid_t)-1)
+		result = 0;
+
+#endif /* __linux__ */
+
+#ifdef __OpenBSD__
+		Atom type;
+		int format;
+		unsigned long len, bytes;
+		unsigned char *prop;
+		pid_t ret;
+
+		if (XGetWindowProperty(dpy, w, XInternAtom(dpy, "_NET_WM_PID", 0), 0, 1, False, AnyPropertyType, &type, &format, &len, &bytes, &prop) != Success || !prop)
+			return 0;
+
+		ret = *(pid_t*)prop;
+		XFree(prop);
+		result = ret;
+
+#endif /* __OpenBSD__ */
+	return result;
+}
+
+
 Client *
 wintoclient(Window w)
 {
@@ -3037,6 +3306,8 @@ main(int argc, char *argv[])
 		fputs("warning: no locale support\n", stderr);
 	if (!(dpy = XOpenDisplay(NULL)))
 		die("dwm: cannot open display");
+	if (!(xcon = XGetXCBConnection(dpy)))
+		die("dwm: cannot get xcb connection\n");
 	checkotherwm();
 	setup();
 #ifdef __OpenBSD__

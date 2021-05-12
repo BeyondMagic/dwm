@@ -23,6 +23,12 @@ static const unsigned int gappiv    = 30;    // vert inner gap between windows
 static const unsigned int gappoh    = 25;    // horiz outer gap between windows and screen edge
 static const unsigned int gappov    = 30;    // vert outer gap between windows and screen edge
 static       int smartgaps          = 0;     // 1 means no outer gap when there is only one window
+static const char slopspawnstyle[]  = "-t 0 -c 0.92,0.85,0.69,0.3 -o"; // do NOT define -f (format) here
+static const char slopresizestyle[] = "-t 0 -c 0.92,0.85,0.69,0.3"; // do NOT define -f (format) here
+static const int riodraw_borders    = 0;        // 0 or 1, indicates whether the area drawn using slop includes the window borders
+static const int riodraw_matchpid   = 1;        // 0 or 1, indicates whether to match the PID of the client that was spawned with riospawn
+static const int riodraw_spawnasync = 0;        // 0 means that the application is only spawned after a successful selection while
+                                                // 1 means that the application is being initialised in the background while the selection is made
 
 
 
@@ -102,6 +108,7 @@ static const char *fonts[]          = { "monospace:size=10" };
 
 static const char *tags[]           = { "1",  "2",  "3",  "4",  "5",  "6",  "7",  "8",  "9"  };
 //static const char *defaulttagapps[] = { "st", NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL };
+#define NUMTAGS 9
 
 
 /****************************************************************************************
@@ -405,6 +412,7 @@ static Key keys[] = {
 
 	{ MODKEY|ShiftMask,           XK_j,      pushdown,       {0} },
 	{ MODKEY|ShiftMask,           XK_k,      pushup,         {0} },
+  { MODKEY,                     XK_n,     switchcol,   {0} },
 //	{ MODKEY,             XK_j,      movestack,      {.i = +1 } },
 //	{ MODKEY,             XK_k,      movestack,      {.i = -1 } },
 
@@ -491,6 +499,12 @@ static Key keys[] = {
 	{ MODKEY|ControlMask|ShiftMask, XK_Left,   moveresizeedge, {.v = "L"} },
 	{ MODKEY|ControlMask|ShiftMask, XK_Right,  moveresizeedge, {.v = "R"} },
 
+  /****************************************************************************************
+   * Create Window by resizing
+   ***************************************************************************************/
+
+	{ ControlMask,                  XK_Return,      riospawn,       {.v = termcmd } },
+	{ ControlMask,                  XK_BackSpace,      rioresize,      {0} },
 
   /****************************************************************************************
    * Commands to be spawned by subshells
