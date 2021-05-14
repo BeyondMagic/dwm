@@ -263,7 +263,7 @@ static void resizemouse(const Arg *arg);
 static void restack(Monitor *m);
 static int riodraw(Client *c, const char slopstyle[]);
 static void rioposition(Client *c, int x, int y, int w, int h);
-static void rioresize(const Arg *arg);
+//static void rioresize(const Arg *arg);
 static void riospawn(const Arg *arg);
 static void run(void);
 static void scan(void);
@@ -1526,9 +1526,12 @@ movemouse(const Arg *arg)
 		return;
 	if (c->isfullscreen) /* no support moving fullscreen windows by mouse */
 		return;
+
+
 	restack(selmon);
 	ocx = c->x;
 	ocy = c->y;
+
 	if (XGrabPointer(dpy, root, False, MOUSEMASK, GrabModeAsync, GrabModeAsync,
 		None, cursor[CurMove]->cursor, CurrentTime) != GrabSuccess)
 		return;
@@ -1565,7 +1568,7 @@ movemouse(const Arg *arg)
 			break;
 		}
 	} while (ev.type != ButtonRelease);
-	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w + c->bw - 1, c->h + c->bw - 1);
+//	XWarpPointer(dpy, None, c->win, 0, 0, 0, 0, c->w + c->bw - 1, c->h + c->bw - 1);
 	XUngrabPointer(dpy, CurrentTime);
 	if ((m = recttomon(c->x, c->y, c->w, c->h)) != selmon) {
 		sendmon(c, m);
@@ -2089,14 +2092,14 @@ rioposition(Client *c, int x, int y, int w, int h)
 	riopid = 0;
 }
 
-/* drag out an area using slop and resize the selected window to it */
+/* drag out an area using slop and resize the selected window to it
 void
 rioresize(const Arg *arg)
 {
 	Client *c = (arg && arg->v ? (Client*)arg->v : selmon->sel);
 	if (c)
 		riodraw(c, slopresizestyle);
-}
+}*/
 
 /* spawn a new window and drag out an area using slop to position it */
 void

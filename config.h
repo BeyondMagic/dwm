@@ -504,7 +504,7 @@ static Key keys[] = {
    ***************************************************************************************/
 
 	{ ControlMask,                  XK_Return,      riospawn,       {.v = termcmd } },
-	{ ControlMask,                  XK_BackSpace,      rioresize,      {0} },
+//	{ ControlMask,                  XK_BackSpace,      rioresize,      {0} },
 
   /****************************************************************************************
    * Commands to be spawned by subshells
