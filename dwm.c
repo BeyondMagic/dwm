@@ -1837,8 +1837,9 @@ pushdown(const Arg *arg) {
 		detach(sel);
 		attach(sel);
 	}
+ 	if (c->isfloating)
+    XRaiseWindow(dpy, c->win);
 	focus(sel);
-	XRaiseWindow(dpy, sel->win);
 	arrange(selmon);
 }
 
@@ -1846,9 +1847,9 @@ void
 pushup(const Arg *arg) {
 	Client *sel = selmon->sel, *c;
 
-	if(!sel || sel->isfloating)
+	if (!sel)
 		return;
-	if((c = prevtiled(sel))) {
+	if ((c = prevtiled(sel))) {
 		detach(sel);
 		sel->next = c;
 		if(selmon->clients == c)
@@ -1863,8 +1864,9 @@ pushup(const Arg *arg) {
 		sel->next = NULL;
 		c->next = sel;
 	}
+	if (c->isfloating)
+    XRaiseWindow(dpy, c->win);
 	focus(sel);
-	XRaiseWindow(dpy, sel->win);
 	arrange(selmon);
 }
 
@@ -2551,6 +2553,8 @@ switchcol(const Arg *arg)
 
 		if (t && (i + 1 > selmon->nmaster) != col) {
 			focus(c);
+			if (c->isfloating)
+				XRaiseWindow(dpy, c->win);
 			restack(selmon);
 			break;
 		}
