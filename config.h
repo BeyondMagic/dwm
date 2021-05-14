@@ -268,10 +268,23 @@ static const Rule rules[] = {
     // monitor
     -1 },
 
-
-
 };
 
+
+void
+unfloatvisible(const Arg *arg)
+{
+    Client *c;
+
+    for (c = selmon->clients; c; c = c->next)
+        if (ISVISIBLE(c) && c->isfloating)
+            c->isfloating = c->isfixed;
+
+    if (arg && arg->v)
+        setlayout(arg);
+    else
+        arrange(selmon);
+}
 
 /****************************************************************************************
  * Layout Settings
@@ -388,6 +401,7 @@ static Key keys[] = {
 	{ MODKEY,                    XK_backslash, view,           {0} },
 	{ MODKEY,                       XK_q,      killclient,     {0} },
 	{ MODKEY,                       XK_0,      view,           {.ui = ~0 } },
+	{ MODKEY,												XK_Tab,		view,		{0} },
 	{ MODKEY|ShiftMask,             XK_0,      tag,            {.ui = ~0 } },
 	{ MODKEY,                       XK_Left,   focusmon,       {.i = -1 } },
 	{ MODKEY,                       XK_Right,  focusmon,       {.i = +1 } },
@@ -410,8 +424,8 @@ static Key keys[] = {
    * Windows
     ****************************************************************************************/
 
-	{ MODKEY|ShiftMask,           XK_j,      pushdown,       {0} },
-	{ MODKEY|ShiftMask,           XK_k,      pushup,         {0} },
+	{ MODKEY|ShiftMask,           XK_j,      pushdown,   {0} },
+	{ MODKEY|ShiftMask,           XK_k,      pushup,     {0} },
   { MODKEY,                     XK_n,     switchcol,   {0} },
 //	{ MODKEY,             XK_j,      movestack,      {.i = +1 } },
 //	{ MODKEY,             XK_k,      movestack,      {.i = -1 } },

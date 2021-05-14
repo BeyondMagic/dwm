@@ -644,6 +644,7 @@ clientmessage(XEvent *e)
 {
 	XClientMessageEvent *cme = &e->xclient;
 	Client *c = wintoclient(cme->window);
+	unsigned int i;
 
 	if (!c)
 		return;
@@ -653,8 +654,16 @@ clientmessage(XEvent *e)
 			setfullscreen(c, (cme->data.l[0] == 1 /* _NET_WM_STATE_ADD    */
 				|| (cme->data.l[0] == 2 /* _NET_WM_STATE_TOGGLE */ && !c->isfullscreen)));
 	} else if (cme->message_type == netatom[NetActiveWindow]) {
-		if (c != selmon->sel && !c->isurgent)
-			seturgent(c, 1);
+//		if (c != selmon->sel && !c->isurgent)
+//			seturgent(c, 1);
+		for (i = 0; i < LENGTH(tags) && !((1 << i) & c->tags); i++);
+		if (i < LENGTH(tags)) {
+			const Arg a = {.ui = 1 << i};
+			selmon = c->mon;
+			view(&a);
+			focus(c);
+			restack(selmon);
+		}
 	}
 }
 
@@ -1829,6 +1838,7 @@ pushdown(const Arg *arg) {
 		attach(sel);
 	}
 	focus(sel);
+	XRaiseWindow(dpy, sel->win);
 	arrange(selmon);
 }
 
@@ -1854,6 +1864,7 @@ pushup(const Arg *arg) {
 		c->next = sel;
 	}
 	focus(sel);
+	XRaiseWindow(dpy, sel->win);
 	arrange(selmon);
 }
 
@@ -2507,29 +2518,43 @@ spawncmd(const Arg *arg)
 void
 switchcol(const Arg *arg)
 {
-	Client *c, *t;
+	Client *sel = selmon->sel, *c, *t;
 	int col = 0;
 	int i;
 
-	if (!selmon->sel)
+	// Nothing at all
+	if (!sel)
 		return;
-	for (i = 0, c = nexttiled(selmon->clients); c ;
-	     c = nexttiled(c->next), i++) {
-		if (c == selmon->sel)
-			col = (i + 1) > selmon->nmaster;
+
+	// Next tiled window?...
+	for (i = 0, c = selmon->clients; c ;
+	c = c->next, i++) {
+
+			if (c == sel)
+				col = (i + 1) > selmon->nmaster;
 	}
+
+	// 
 	if (i <= selmon->nmaster)
 		return;
+
+	// 
 	for (c = selmon->stack; c; c = c->snext) {
+
+		// If it's not visible, continue the run
 		if (!ISVISIBLE(c))
 			continue;
-		for (i = 0, t = nexttiled(selmon->clients); t && t != c;
-		     t = nexttiled(t->next), i++);
+
+		for (i = 0, t = selmon->clients;
+				 t && t != c;
+		     t = t->next, i++);
+
 		if (t && (i + 1 > selmon->nmaster) != col) {
 			focus(c);
 			restack(selmon);
 			break;
 		}
+
 	}
 }
 
