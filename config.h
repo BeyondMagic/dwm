@@ -408,6 +408,7 @@ static Key keys[] = {
    * Windows
     ****************************************************************************************/
 
+	{ MODKEY|ShiftMask,             XK_x,      killunsel,      {0} },
 	{ MODKEY|ShiftMask,           XK_j,      pushdown,   {0} },
 	{ MODKEY|ShiftMask,           XK_k,      pushup,     {0} },
   { MODKEY,                     XK_n,     switchcol,   {0} },
@@ -444,7 +445,6 @@ static Key keys[] = {
 	{ MODKEY,                       XK_f,      togglefullscr,     {0} }, // dwm-actualfullscreen
 	{ MODKEY,                       XK_s,      togglesticky,   {0} },
 //	{ MODKEY,                       XK_m,      swapfocus,      {0} },
-
 
 
   /****************************************************************************************
@@ -488,14 +488,14 @@ static Key keys[] = {
 	{ MODKEY|ShiftMask,             XK_Up,     moveresize,     {.v = "0x 0y 0w -5h" } },
 	{ MODKEY|ShiftMask,             XK_Right,  moveresize,     {.v = "0x 0y 5w 0h" } },
 	{ MODKEY|ShiftMask,             XK_Left,   moveresize,     {.v = "0x 0y -5w 0h" } },
-	{ MODKEY|ControlMask,           XK_Up,     moveresizeedge, {.v = "t"} },
+/*	{ MODKEY|ControlMask,           XK_Up,     moveresizeedge, {.v = "t"} },
 	{ MODKEY|ControlMask,           XK_Down,   moveresizeedge, {.v = "b"} },
 	{ MODKEY|ControlMask,           XK_Left,   moveresizeedge, {.v = "l"} },
 	{ MODKEY|ControlMask,           XK_Right,  moveresizeedge, {.v = "r"} },
 	{ MODKEY|ControlMask|ShiftMask, XK_Up,     moveresizeedge, {.v = "T"} },
   { MODKEY|ControlMask|ShiftMask, XK_Down,   moveresizeedge, {.v = "B"} },
 	{ MODKEY|ControlMask|ShiftMask, XK_Left,   moveresizeedge, {.v = "L"} },
-	{ MODKEY|ControlMask|ShiftMask, XK_Right,  moveresizeedge, {.v = "R"} },
+	{ MODKEY|ControlMask|ShiftMask, XK_Right,  moveresizeedge, {.v = "R"} },*/
 
   /****************************************************************************************
    * Create Window by resizing

@@ -239,6 +239,7 @@ static void incnmaster(const Arg *arg);
 static int isdescprocess(pid_t p, pid_t c);
 static void keypress(XEvent *e);
 static void killclient(const Arg *arg);
+static void killunsel(const Arg *arg);
 static void manage(Window w, XWindowAttributes *wa);
 static void managealtbar(Window win, XWindowAttributes *wa);
 static void mappingnotify(XEvent *e);
@@ -246,7 +247,7 @@ static void maprequest(XEvent *e);
 static void monocle(Monitor *m);
 static void motionnotify(XEvent *e);
 static void moveresize(const Arg *arg);
-static void moveresizeedge(const Arg *arg);
+//static void moveresizeedge(const Arg *arg);
 static void movemouse(const Arg *arg);
 static Client *nexttiled(Client *c);
 static void pop(Client *);
@@ -1361,6 +1362,29 @@ killclient(const Arg *arg)
 }
 
 void
+killunsel(const Arg *arg)
+{
+	Client *i = NULL;
+
+	if (!selmon->sel)
+		return;
+
+	for (i = selmon->clients; i; i = i->next) {
+		if (ISVISIBLE(i) && i != selmon->sel) {
+			if (!sendevent(i, wmatom[WMDelete])) {
+				XGrabServer(dpy);
+				XSetErrorHandler(xerrordummy);
+				XSetCloseDownMode(dpy, DestroyAll);
+				XKillClient(dpy, i->win);
+				XSync(dpy, False);
+				XSetErrorHandler(xerror);
+				XUngrabServer(dpy);
+			}
+		}
+	}
+}
+
+void
 manage(Window w, XWindowAttributes *wa)
 {
 	Client *c, *t = NULL;
@@ -1600,7 +1624,7 @@ moveresize(const Arg *arg) {
 	if (!c || !arg)
 		return;
 	if (selmon->lt[selmon->sellt]->arrange && !c->isfloating)
-		return;
+		togglefloating(NULL);
 	if (sscanf((char *)arg->v, "%d%c %d%c %d%c %d%c", &x, &xAbs, &y, &yAbs, &w, &wAbs, &h, &hAbs) != 8)
 		return;
 
@@ -1651,9 +1675,9 @@ moveresize(const Arg *arg) {
 	}
 }
 
-void
+/*void
 moveresizeedge(const Arg *arg) {
-	/* move or resize floating window to edge of screen */
+	// move or resize floating window to edge of screen
 	Client *c;
 	c = selmon->sel;
 	char e;
@@ -1691,7 +1715,7 @@ moveresizeedge(const Arg *arg) {
 		nx = c->w > selmon->mw - 2 * c->bw ? selmon->mx + c->w : selmon->mx + selmon->mw - c->w - 2 * c->bw;
 
 	if(e == 'T') {
-		/* if you click to resize again, it will return to old size/position */
+		/\* if you click to resize again, it will return to old size/position \*\/
 		if(c->h + starty == c->oldh + c->oldy) {
 			nh = c->oldh;
 			ny = c->oldy;
@@ -1726,13 +1750,13 @@ moveresizeedge(const Arg *arg) {
 	Bool xqp = XQueryPointer(dpy, root, &dummy, &dummy, &msx, &msy, &dx, &dy, &dui);
 	resize(c, nx, ny, nw, nh, True);
 
-	/* move cursor along with the window to avoid problems caused by the sloppy focus */
+	\/\* move cursor along with the window to avoid problems caused by the sloppy focus \*\/
 	if (xqp && ox <= msx && (ox + ow) >= msx && oy <= msy && (oy + oh) >= msy) {
 		nmx = c->x - ox + c->w - ow;
 		nmy = c->y - oy + c->h - oh;
 		XWarpPointer(dpy, None, None, 0, 0, 0, 0, nmx, nmy);
 	}
-}
+}*/
 
 
 Client *
@@ -1837,9 +1861,9 @@ pushdown(const Arg *arg) {
 		detach(sel);
 		attach(sel);
 	}
- 	if (c->isfloating)
-    XRaiseWindow(dpy, c->win);
 	focus(sel);
+	if (c->isfloating)
+    XRaiseWindow(dpy, c->win);
 	arrange(selmon);
 }
 
@@ -1864,9 +1888,9 @@ pushup(const Arg *arg) {
 		sel->next = NULL;
 		c->next = sel;
 	}
+	focus(sel);
 	if (c->isfloating)
     XRaiseWindow(dpy, c->win);
-	focus(sel);
 	arrange(selmon);
 }
 

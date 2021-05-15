@@ -4,6 +4,14 @@
 
 <p align="center">tiling window manager utility for X.</p>
 
++ Super + Shift + X : kill unselected windows;
++ Super + N : select most recent window;
++ Super + Tab : select most recent tag;
++ Super + J : select next window;
++ Super + K : select previous window;
++ Super + Arrows : move floating window;
++ Super + Shift + Arrows : resize floating window;
+
 ## FAQ
 
 Bindings are well documented on the source code.
