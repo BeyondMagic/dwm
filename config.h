@@ -137,6 +137,8 @@ static const Rule rules[] = {
     0,
     // isalwaysontop
     0,
+    // isfreesize
+    0,
     // monitor
     -1 },
 
@@ -152,6 +154,8 @@ static const Rule rules[] = {
     1,
     // isalwaysontop
     1,
+    // isfreesize
+    0,
     // monitor
     -1 },
 
@@ -167,6 +171,8 @@ static const Rule rules[] = {
     0,
     // isalwaysontop
     0,
+    // isfreesize
+    0,
     // monitor
     -1 },
 	// class
@@ -181,8 +187,11 @@ static const Rule rules[] = {
     0,
     // isalwaysontop
     0,
+    // isfreesize
+    0,
     // monitor
     -1 },
+
 	// class
 	{ "Gcolor2",
     //instance
@@ -195,8 +204,11 @@ static const Rule rules[] = {
     0,
     // isalwaysontop
     0,
+    // isfreesize
+    0,
     // monitor
     -1 },
+
 	// class
 	{ "Visualboyadvance-m",
     //instance
@@ -208,6 +220,8 @@ static const Rule rules[] = {
     // isfloating
     1,
     // isalwaysontop
+    0,
+    // isfreesize
     0,
     // monitor
     -1 },
@@ -223,8 +237,11 @@ static const Rule rules[] = {
     1,
     // isalwaysontop
     0,
+    // isfreesize
+    0,
     // monitor
     -1 },
+
 	// class
 	{ NULL,
     //instance
@@ -237,6 +254,25 @@ static const Rule rules[] = {
     1,
     // isalwaysontop
     0,
+    // isfreesize
+    0,
+    // monitor
+    -1 },
+
+	// class
+	{ NULL,
+    //instance
+    NULL,
+    // title
+    "freesizedwm",
+    // tags mask
+    0,
+    // isfloating
+    1,
+    // isalwaysontop
+    0,
+    // isfreesize
+    1,
     // monitor
     -1 },
 
@@ -252,6 +288,8 @@ static const Rule rules[] = {
     1,
     // isalwaysontop
     0,
+    // isfreesize
+    0,
     // monitor
     -1 },
 
@@ -266,6 +304,8 @@ static const Rule rules[] = {
     // isfloating
     0,
     // isalwaysontop
+    0,
+    // isfreesize
     0,
     // monitor
     -1 },

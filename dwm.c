@@ -122,7 +122,7 @@ struct Client {
 	unsigned int tags;
 //	int isfixed, isfloating, isurgent, neverfocus, oldstate, isfullscreen;
   int isfixed, isfloating, isurgent, neverfocus, oldstate, isfullscreen,
-      issticky, isalwaysontop;
+      issticky, isalwaysontop, isfreesize;
   pid_t pid;
 	Client *next;
 	Client *snext;
@@ -183,6 +183,7 @@ typedef struct {
 	unsigned int tags;
 	int isfloating;
   int isalwaysontop;
+  int isfreesize;
 	int monitor;
 } Rule;
 
@@ -400,6 +401,7 @@ applyrules(Client *c)
 	XClassHint ch = { NULL, NULL };
 
 	/* rule matching */
+	c->isfreesize = 1;
 	c->isfloating = 0;
   c->isalwaysontop = 0;
 	c->tags = 0;
@@ -415,6 +417,7 @@ applyrules(Client *c)
 		&& (!r->instance || strstr(instance, r->instance)))
 		{
 			c->isfloating = r->isfloating;
+			c->isfreesize = r->isfreesize;
       c->isalwaysontop = r->isalwaysontop;
 			c->tags |= r->tags;
 			for (m = mons; m && m->num != r->monitor; m = m->next);
@@ -1388,6 +1391,7 @@ killunsel(const Arg *arg)
 void
 manage(Window w, XWindowAttributes *wa)
 {
+//	int gotoc;
 	Client *c, *t = NULL;
 	Window trans = None;
 	XWindowChanges wc;
@@ -1416,6 +1420,7 @@ manage(Window w, XWindowAttributes *wa)
 	if (c->y + HEIGHT(c) > c->mon->my + c->mon->mh)
 		c->y = c->mon->my + c->mon->mh - HEIGHT(c);
 	c->x = MAX(c->x, c->mon->mx);
+
 	/* only fix client y-offset, if the client center might cover the bar */
 	c->y = MAX(c->y, ((c->mon->by == c->mon->my) && (c->x + (c->w / 2) >= c->mon->wx)
 		&& (c->x + (c->w / 2) < c->mon->wx + c->mon->ww)) ? bh : c->mon->my);
@@ -1430,14 +1435,23 @@ manage(Window w, XWindowAttributes *wa)
 		XSetWindowBorder(dpy, w, scheme[SchemeNorm][ColBorder].pixel);
 	configure(c); /* propagates border_width, if size doesn't change */
 	updatewindowtype(c);
+
 	updatesizehints(c);
 	updatewmhints(c);
 	c->sfx = c->x;
 	c->sfy = c->y;
 	c->sfw = c->w;
 	c->sfh = c->h;
-	c->x = c->mon->mx + (c->mon->mw - WIDTH(c)) / 2;  // dwm-alwayscenter
-	c->y = c->mon->my + (c->mon->mh - HEIGHT(c)) / 2; // dwm-alwayscenter
+	
+	//fprintf("echo new, %i\n", gotoc);
+	if (!c->isfreesize) {
+		c->x = c->mon->mx + (c->mon->mw - WIDTH(c)) / 2;  // dwm-alwayscenter
+		c->y = c->mon->my + (c->mon->mh - HEIGHT(c)) / 2; // dwm-alwayscenter
+	}
+
+	// verify what this returns
+
+
 	XSelectInput(dpy, w, EnterWindowMask|FocusChangeMask|PropertyChangeMask|StructureNotifyMask);
 	grabbuttons(c, 0);
 	if (!c->isfloating)
@@ -1598,7 +1612,7 @@ movemouse(const Arg *arg)
 				ny = selmon->wy + selmon->wh - HEIGHT(c);
 			if (!c->isfloating && selmon->lt[selmon->sellt]->arrange
 					&& (abs(nx - c->x) > snap || abs(ny - c->y) > snap))
-				togglefloating(NULL);
+				return;
 			if (!selmon->lt[selmon->sellt]->arrange || c->isfloating)
 				resize(c, nx, ny, c->w, c->h, 1);
 
@@ -1628,7 +1642,7 @@ moveresize(const Arg *arg) {
 	if (!c || !arg)
 		return;
 	if (selmon->lt[selmon->sellt]->arrange && !c->isfloating)
-		togglefloating(NULL);
+		return;
 	if (sscanf((char *)arg->v, "%d%c %d%c %d%c %d%c", &x, &xAbs, &y, &yAbs, &w, &wAbs, &h, &hAbs) != 8)
 		return;
 
@@ -3056,12 +3070,14 @@ updatenumlockmask(void)
 void
 updatesizehints(Client *c)
 {
+//	int gotoc;
 	long msize;
 	XSizeHints size;
 
 	if (!XGetWMNormalHints(dpy, c->win, &size, &msize))
 		/* size is uninitialized, ensure that size.flags aren't used */
-		size.flags = PSize;
+//		size.flags = PSize;
+		size.flags = 0;
 	if (size.flags & PBaseSize) {
 		c->basew = size.base_width;
 		c->baseh = size.base_height;
@@ -3093,7 +3109,13 @@ updatesizehints(Client *c)
 		c->maxa = (float)size.max_aspect.x / size.max_aspect.y;
 	} else
 		c->maxa = c->mina = 0.0;
+	if((size.flags & PSize) && c->isfreesize && c->isfloating) {
+		c->basew = size.base_width;
+		c->baseh = size.base_height;
+	}
 	c->isfixed = (c->maxw && c->maxh && c->maxw == c->minw && c->maxh == c->minh);
+
+//	return gotoc;
 }
 
 void
@@ -3140,8 +3162,10 @@ updatewindowtype(Client *c)
 
 	if (state == netatom[NetWMFullscreen])
 		setfullscreen(c, 1);
-	if (wtype == netatom[NetWMWindowTypeDialog])
+	if (wtype == netatom[NetWMWindowTypeDialog]) {
 		c->isfloating = 1;
+		c->isfreesize = 1;
+	}
 }
 
 void
