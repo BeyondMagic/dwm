@@ -12,7 +12,7 @@
 
 
 
-static const char *menuscript[]			= { "/home/magic/github/scripts/system/rootclick", NULL }; // script to open menu
+static const char *menuscript[]			= { "/home/iris/git/scripts/root/rootclick", NULL }; // script to open menu
 static const unsigned int borderpx  = 1;    // border pixel of windows
 static const unsigned int snap      = 3;    // snap pixel
 static const int extrabarright      = 0;    // 1 means extra bar text on right */
@@ -160,7 +160,7 @@ static const Rule rules[] = {
     -1 },
 
 	// class
-	{ "firefox",
+	{ "Nightly",
     //instance
     NULL,
     // title
@@ -465,17 +465,16 @@ static Key keys[] = {
    *****************************************************************************************/
 
 
-	{ MODKEY|ShiftMask,           XK_space,  togglefloating, {0} },
-  { MODKEY,			        XK_t,		setlayout,	{.v = &layouts[0]} },   // tile                   : Super     +     t 
-  { MODKEY|ShiftMask,		XK_t,		setlayout,	{.v = &layouts[1]} },   // bstack                 : Super + Shift + T
-  { MODKEY,			        XK_y,		setlayout,	{.v = &layouts[2]} },   // spiral                 : Super     +     y
-  { MODKEY|ShiftMask,		XK_y,		setlayout,	{.v = &layouts[3]} },   // dwindle                : Super + Shift + Y
-  { MODKEY,			        XK_u,		setlayout,	{.v = &layouts[4]} },   // deck                   : Super     +     u
-  { MODKEY|ShiftMask,		XK_u,		setlayout,	{.v = &layouts[5]} },   // monocle                : Super + Shift + U
-  { MODKEY,		        	XK_i,		setlayout,	{.v = &layouts[6]} },   // centeredmaster         : Super     +     I
-  { MODKEY|ShiftMask,		XK_i,		setlayout,	{.v = &layouts[7]} },   // centeredfloatingmaster : Super + Shift + i
-	{ MODKEY|ControlMask, XK_period, cyclelayout,     {.i = +1 } },
-
+	{ ShiftMask|ControlMask, XK_space,  togglefloating, {0} },
+  { MODKEY,			        XK_t,		   setlayout,	     {.v = &layouts[0]} },   // tile                   : Super     +     t 
+  { MODKEY|ShiftMask,		XK_t,		   setlayout,	     {.v = &layouts[1]} },   // bstack                 : Super + Shift + T
+  { MODKEY,			        XK_y,		   setlayout,	     {.v = &layouts[2]} },   // spiral                 : Super     +     y
+  { MODKEY|ShiftMask,		XK_y,	     setlayout,	     {.v = &layouts[3]} },   // dwindle                : Super + Shift + Y
+  { MODKEY,			        XK_u,		   setlayout,	     {.v = &layouts[4]} },   // deck                   : Super     +     u
+  { MODKEY|ShiftMask,		XK_u,		   setlayout,	     {.v = &layouts[5]} },   // monocle                : Super + Shift + U
+  { MODKEY,		        	XK_i,		   setlayout,	     {.v = &layouts[6]} },   // centeredmaster         : Super     +     I
+  { MODKEY|ShiftMask,		XK_i,		   setlayout,	     {.v = &layouts[7]} },   // centeredfloatingmaster : Super + Shift + i
+	{ MODKEY|ControlMask, XK_period, cyclelayout,    {.i = +1 } },
 
    /****************************************************************************************
    * Patches
@@ -567,9 +566,9 @@ static Key keys[] = {
 
 static Button buttons[] = {
 	/* click                event mask      button          function        argument */
-	{ ClkClientWin,         MODKEY,         Button1,        movemouse,      {0} },
-	{ ClkClientWin,         MODKEY,         Button2,        togglefloating, {0} },
-	{ ClkClientWin,         MODKEY,         Button3,        resizemouse,    {0} },
+	{ ClkClientWin,         ShiftMask,         Button1,        movemouse,      {0} },
+	{ ClkClientWin,         ShiftMask,         Button2,        togglefloating, {0} },
+	{ ClkClientWin,         ShiftMask,         Button3,        resizemouse,    {0} },
 	{ ClkRootWin,						0,							Button3,			  spawn,   {.v = menuscript } },
 ///	{ ClkTagBar,            MODKEY,         Button1,        tag,            {0} },
 //	{ ClkTagBar,            MODKEY,         Button3,        toggletag,      {0} },
