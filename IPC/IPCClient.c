@@ -3,7 +3,7 @@
 #include <string.h>
 #include <sys/epoll.h>
 
-#include "util.h"
+#include "../util.h"
 
 IPCClient *
 ipc_client_new(int fd)

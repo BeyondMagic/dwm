@@ -371,7 +371,7 @@ static Monitor *mons, *selmon, *lastselmon;
 static Window root, wmcheckwin;
 static xcb_connection_t *xcon;
 
-#include "ipc.h"
+#include "./IPC/ipc.h"
 
 /* configuration, allows nested code to access above variables */
 #include "config.h"
@@ -387,9 +387,9 @@ struct Pertag {
 
 
 #ifdef VERSION
-#include "IPCClient.c"
-#include "yajl_dumps.c"
-#include "ipc.c"
+#include "./IPC/IPCClient.c"
+#include "./IPC/yajl_dumps.c"
+#include "./IPC/ipc.c"
 #endif
 
 /* compile-time check if all tags fit into an unsigned int bit array. */

@@ -13,7 +13,7 @@
 #include <yajl/yajl_gen.h>
 #include <yajl/yajl_tree.h>
 
-#include "util.h"
+#include "../util.h"
 #include "yajl_dumps.h"
 
 static struct sockaddr_un sockaddr;

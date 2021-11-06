@@ -175,6 +175,7 @@ static const Rule rules[] = {
     0,
     // monitor
     -1 },
+  
 	// class
 	{ "Gimp",
     //instance
@@ -260,6 +261,23 @@ static const Rule rules[] = {
     -1 },
 
 	// class
+	{ "Pavucontrol",
+    //instance
+    NULL,
+    // title
+    NULL,
+    // tags mask
+    0,
+    // isfloating
+    1,
+    // isalwaysontop
+    0,
+    // isfreesize
+    0,
+    // monitor
+    -1 },
+
+	// class
 	{ NULL,
     //instance
     NULL,
@@ -277,6 +295,23 @@ static const Rule rules[] = {
     -1 },
 
 	// class
+	{ NULL,
+    //instance
+    NULL,
+    // title
+    "preview_dwm",
+    // tags mask
+    0,
+    // isfloating
+    1,
+    // isalwaysontop
+    0,
+    // isfreesize
+    1,
+    // monitor
+    -1 },
+
+  // class
 	{ NULL,
     //instance
     NULL,
@@ -328,8 +363,7 @@ static const int resizehints = 1;    // 1 means respect size hints in tiled resi
 
 #define FORCE_VSPLIT 1  // nrowgrid layout: force two clients to always split vertically
 
-#include "vanitygaps.c"
-#include "movestack.c"
+#include "./vanitygaps/vanitygaps.c"
 
 static const Layout layouts[] = {
 	/* symbol     arrange function */
