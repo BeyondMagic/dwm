@@ -23,7 +23,7 @@ XCBLIBS = -lX11-xcb -lxcb -lxcb-res
 # OpenBSD (uncomment)
 #FREETYPEINC = ${X11INC}/freetype2
 
-# yajl
+# yajl for ipc and dwm-msg
 YAJLLIBS = -lyajl
 YAJLINC = /usr/include/yajl
 

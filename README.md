@@ -1,6 +1,6 @@
 <h1 align="center">dwm - dynamic window manager</h1>
 
-<img align="center" src="preview.png">
+<img align="center" src="/.github/black-blur/preview1.png">
 
 <p align="center">
   <a href="https://dwm.suckless.org/">
@@ -10,6 +10,14 @@
 
 <p align="center">tiling window manager utility for X.</p>
 
+
+---
+
+# Some Keybinds
+
++ Shift + Click : move window;
++ Shift + Middle Click : switch floating of window;
++ Shift + Hold 2nd Click : resize floating window;
 + Super + Shift + X : kill unselected windows;
 + Super + N : select most recent window;
 + Super + Tab : select most recent tag;
@@ -20,21 +28,42 @@
 
 ## Patches
 
-+ restartsig
-+ pertag
-+ movemouse window
-+ vanitygaps
++ [restartsig](https://dwm.suckless.org/patches/restartsig/)
++ [pertag](https://dwm.suckless.org/patches/pertag/)
++ movemouse custom
++ [vanitygaps](https://dwm.suckless.org/patches/vanitygaps/)
++ [anybar](https://dwm.suckless.org/patches/anybar/)
++ [ipc](https://dwm.suckless.org/patches/ipc/)
 
-## FAQ
+---
 
-Bindings are well documented on the source code.
+## Packages
 
-There is no inbuilt bar for this, you have to run an external one. I'm using [mine with those scripts](github.com/beyondMagic/scripts) (lemonbar)
++ slop
++ libxft | libxft-bgra
 
-## Installation for newbs
+---
+
+## Installation
 
 ```
 git clone https://github.com/BeyondMagic/dwm.git
 cd dwm
 make
 ```
+
+---
+
+## Bar
+
+Bar is running with two [lemnonbar](https://github.com/BeyondMagic/scripts/tree/master/bars)(s).
+
+---
+
+## Screenshots
+
+### Black-Blur
+
+<img align="center" src="/.github/black-blur/preview2.png">
+
+### White-Blur

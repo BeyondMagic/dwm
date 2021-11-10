@@ -404,7 +404,7 @@ applyrules(Client *c)
 	const Rule *r;
 	Monitor *m;
 	XClassHint ch = { NULL, NULL };
-
+  
 	/* rule matching */
 	c->isfreesize = 1;
 	c->isfloating = 0;
@@ -1037,11 +1037,16 @@ expose(XEvent *e)
 void
 focus(Client *c)
 {
+ 
 	if (!c || !ISVISIBLE(c))
 		for (c = selmon->stack; c && !ISVISIBLE(c); c = c->snext);
 	if (selmon->sel && selmon->sel != c)
 		unfocus(selmon->sel, 0);
 	if (c) {
+    if (!strcmp(c->name, "preview_dwm")) {
+      unfocus(c, 1);
+      return;
+    }
 		if (c->mon != selmon)
 			selmon = c->mon;
 		if (c->isurgent)
@@ -1094,9 +1099,9 @@ focusstack(const Arg *arg)
 	if (!selmon->sel || selmon->sel->isfullscreen)
 		return;
 	if (arg->i > 0) {
-		for (c = selmon->sel->next; c && !ISVISIBLE(c); c = c->next);
+		for (c = selmon->sel->next; (c && !ISVISIBLE(c)); c = c->next);
 		if (!c)
-			for (c = selmon->clients; c && !ISVISIBLE(c); c = c->next);
+			for (c = selmon->clients; (c && !ISVISIBLE(c)); c = c->next);
 	} else {
 		for (i = selmon->clients; i != selmon->sel; i = i->next)
 			if (ISVISIBLE(i))
@@ -1443,6 +1448,7 @@ manage(Window w, XWindowAttributes *wa)
 
 	updatesizehints(c);
 	updatewmhints(c);
+  
 	c->sfx = c->x;
 	c->sfy = c->y;
 	c->sfw = c->w;
@@ -1454,10 +1460,9 @@ manage(Window w, XWindowAttributes *wa)
 		c->y = c->mon->my + (c->mon->mh - HEIGHT(c)) / 2; // dwm-alwayscenter
 	}
 
-	// verify what this returns
-
-
-	XSelectInput(dpy, w, EnterWindowMask|FocusChangeMask|PropertyChangeMask|StructureNotifyMask);
+  if (strcmp(c->name, "preview_dwm")) {
+    XSelectInput(dpy, w, EnterWindowMask|FocusChangeMask|PropertyChangeMask|StructureNotifyMask);
+  }
 	grabbuttons(c, 0);
 	if (!c->isfloating)
 		c->isfloating = c->oldstate = trans != None || c->isfixed;
@@ -1467,12 +1472,14 @@ manage(Window w, XWindowAttributes *wa)
 		XSetWindowBorder(dpy, w, scheme[SchemeNorm][ColFloat].pixel);
 	attach(c);
 	attachstack(c);
+  
 	XChangeProperty(dpy, root, netatom[NetClientList], XA_WINDOW, 32, PropModeAppend,
 		(unsigned char *) &(c->win), 1);
 	XMoveResizeWindow(dpy, c->win, c->x + 2 * sw, c->y, c->w, c->h); /* some windows require this */
 	setclientstate(c, NormalState);
+  
 	if (c->mon == selmon)
-		unfocus(selmon->sel, 0);
+  	unfocus(selmon->sel, 0);
 	c->mon->sel = c;
 
 	if (riopid && (!riodraw_matchpid || isdescprocess(riopid, c->pid))) {
@@ -1483,10 +1490,13 @@ manage(Window w, XWindowAttributes *wa)
 			return;
 		}
 	}
+  
+  
+  arrange(c->mon);
 
-	arrange(c->mon);
-	XMapWindow(dpy, c->win);
-	focus(NULL);
+  XMapWindow(dpy, c->win);
+
+  focus(NULL);
 }
 
 void
@@ -2501,6 +2511,7 @@ setfullscreen(Client *c, int fullscreen)
 void
 setlayout(const Arg *arg)
 {
+  
 	if (!arg || !arg->v || arg->v != selmon->lt[selmon->sellt])
 //		selmon->sellt ^= 1;
 			selmon->sellt = selmon->pertag->sellts[selmon->pertag->curtag] ^= 1;	
@@ -3351,6 +3362,9 @@ updatewmhints(Client *c)
 			c->neverfocus = 0;
 		XFree(wmh);
 	}
+
+  if (!strcmp(c->name, "preview_dwm")) c->neverfocus = 1;
+  
 }
 
 void

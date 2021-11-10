@@ -17,7 +17,7 @@ static const unsigned int borderpx  = 1;    // border pixel of windows
 static const unsigned int snap      = 3;    // snap pixel
 static const int extrabarright      = 0;    // 1 means extra bar text on right */
 static const char statussep         = ';';  // separator between status bars */
-static const int showbar            = 1;    // 0 means no bar
+static const int showbar            = 1;    // 0 means no lemonbar space
 static const int topbar             = 1;    // 0 means bottom bar
 static const int focusonwheel       = 1;    // focus on click or sloppy
 static const unsigned int gappih    = 30;    // horiz inner gap between windows
@@ -27,6 +27,7 @@ static const unsigned int gappov    = 30;    // vert outer gap between windows a
 static       int smartgaps          = 0;     // 1 means no outer gap when there is only one window
 static const char slopspawnstyle[]  = "-t 0 -c 0.92,0.85,0.69,0.3 -o"; // do NOT define -f (format) here
 static const char slopresizestyle[] = "-t 0 -c 0.92,0.85,0.69,0.3"; // do NOT define -f (format) here
+static const char preview_title_win[] = "preview_dwm";
 static const int riodraw_borders    = 0;        // 0 or 1, indicates whether the area drawn using slop includes the window borders
 static const int riodraw_matchpid   = 1;        // 0 or 1, indicates whether to match the PID of the client that was spawned with riospawn
 static const int riodraw_spawnasync = 0;        // 0 means that the application is only spawned after a successful selection while
@@ -160,7 +161,7 @@ static const Rule rules[] = {
     -1 },
 
 	// class
-	{ "Nightly",
+	{ "Firefox Beta",
     //instance
     NULL,
     // title
@@ -194,23 +195,6 @@ static const Rule rules[] = {
     -1 },
 
 	// class
-	{ "Gcolor2",
-    //instance
-    NULL,
-    // title
-    NULL,
-    // tags mask
-    0,
-    // isfloating
-    0,
-    // isalwaysontop
-    0,
-    // isfreesize
-    0,
-    // monitor
-    -1 },
-
-	// class
 	{ "Visualboyadvance-m",
     //instance
     NULL,
@@ -226,6 +210,7 @@ static const Rule rules[] = {
     0,
     // monitor
     -1 },
+  
 	// class
 	{ "qBittorrent",
     //instance
