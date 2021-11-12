@@ -436,7 +436,7 @@ static Key keys[] = {
 
 
 //	{ MODKEY,                       XK_p,      spawn,          {.v = dmenucmd } },
-	{ MODKEY,                       XK_Return, spawn,          {.v = termcmd } },
+//	{ MODKEY,                       XK_Return, spawn,          {.v = termcmd } },
 //	{ MODKEY,                       XK_b,      togglebar,      {0} },
 	{ MODKEY,                       XK_o,      incnmaster,     {.i = +1 } },
 	{ MODKEY|ShiftMask,             XK_o,      incnmaster,     {.i = -1 } },
@@ -567,12 +567,6 @@ static Key keys[] = {
   /****************************************************************************************
    * Commands to be spawned by subshells
    ****************************************************************************************/
-
-
-	{ MODKEY,			XK_d,		spawn,          SHCMD("dmenu_run -r -i") },
-	{ MODKEY,			XK_comma,	spawn,		SHCMD("mpc prev") },
-	{ MODKEY,			XK_period,	spawn,		SHCMD("mpc next") },
-  { MODKEY|ShiftMask,		XK_period,	spawn,		SHCMD("mpc repeat") },
 
 };
 
