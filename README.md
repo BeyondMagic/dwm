@@ -34,6 +34,7 @@
 + [vanitygaps](https://dwm.suckless.org/patches/vanitygaps/)
 + [anybar](https://dwm.suckless.org/patches/anybar/)
 + [ipc](https://dwm.suckless.org/patches/ipc/)
++ [riodraw](https://github.com/bakkeby/patches/blob/master/dwm/dwm-riodraw-nopidmatching-6.2.diff)
 
 ---
 
