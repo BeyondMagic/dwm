@@ -18,7 +18,6 @@ static const unsigned int snap      = 3;    // snap pixel
 static const int extrabarright      = 0;    // 1 means extra bar text on right */
 static const char statussep         = ';';  // separator between status bars */
 static const int showbar            = 1;    // 0 means no lemonbar space
-static const int topbar             = 1;    // 0 means bottom bar
 static const int focusonwheel       = 1;    // focus on click or sloppy
 static const unsigned int gappih    = 30;    // horiz inner gap between windows
 static const unsigned int gappiv    = 30;    // vert inner gap between windows
@@ -62,9 +61,8 @@ static const MonitorRule monrules[] = {
  ****************************************************************************************/
 
 
-static const int usealtbar          = 1;          // 1 means use non-dwm status bar
-static const char *altbarclass      = "Bar";      // Alternate bar class name
-static const char *altbarcmd        = "dont_run"; // Alternate bar launch command 
+static const int topbar             = 1;          // 0 means bottom bar
+static const char *altbarclass      = "Bar";      // Alternate bar class name (Bar is for lemonbar)
 
 
 /****************************************************************************************
