@@ -62,7 +62,7 @@
                                * MAX(0, MIN((y)+(h),(z)->y+(z)->h) - MAX((y),(z)->y)))
 #define ISINC(X)                ((X) > 1000 && (X) < 3000)
 //#define ISVISIBLE(C)          ((C->tags & C->mon->tagset[C->mon->seltags]))
-#define ISVISIBLE(C)            ((C->tags & C->mon->tagset[C->mon->seltags]) || C->issticky || C->isalwaysontop)
+#define ISVISIBLE(C)            ((C->tags & C->mon->tagset[C->mon->seltags]) || C->issticky)
 #define PREVSEL                 3000
 #define LENGTH(X)               (sizeof X / sizeof X[0])
 #define MOD(N,M)                ((N)%(M) < 0 ? (N)%(M) + (M) : (N)%(M))
@@ -79,6 +79,7 @@ enum { CurNormal, CurResize, CurMove, CurLast }; /* cursor */
 enum { SchemeNorm, SchemeSel }; /* color schemes */
 enum { NetSupported, NetWMName, NetWMState, NetWMCheck,
        NetWMFullscreen, NetActiveWindow, NetWMWindowType,
+       NetWMWindowTypeDesktop,
        NetWMWindowTypeDialog, NetClientList, NetLast }; /* EWMH atoms */
 enum { WMProtocols, WMDelete, WMState, WMTakeFocus, WMLast }; /* default atoms */
 enum { ClkTagBar, ClkLtSymbol, ClkStatusText, ClkWinTitle,
@@ -124,7 +125,7 @@ struct Client {
 	unsigned int tags;
 //	int isfixed, isfloating, isurgent, neverfocus, oldstate, isfullscreen;
   int isfixed, isfloating, isurgent, neverfocus, oldstate, isfullscreen,
-      issticky, isalwaysontop, isfreesize, beingmoved;
+      issticky, isfreesize, beingmoved;
   pid_t pid;
 	Client *next;
 	Client *snext;
@@ -184,9 +185,9 @@ typedef struct {
 	const char *title;
 	unsigned int tags;
 	int isfloating;
-  int isalwaysontop;
   int isfreesize;
 	int monitor;
+  int unmanaged;
 } Rule;
 
 typedef struct {
@@ -329,6 +330,7 @@ static const char broken[] = "broken";
 static int screen;
 static int sw, sh;           /* X display screen geometry width, height */
 static int bh;      /* bar geometry */
+static int unmanaged = 0;    /* whether the window manager should manage the new window or not */
 static int lrpad;            /* sum of left and right padding for text */
 static int (*xerrorxlib)(Display *, XErrorEvent *);
 static unsigned int numlockmask = 0;
@@ -399,7 +401,6 @@ applyrules(Client *c)
 	/* rule matching */
 	c->isfreesize = 1;
 	c->isfloating = 0;
-  c->isalwaysontop = 0;
 	c->tags = 0;
 	XGetClassHint(dpy, c->win, &ch);
 	class    = ch.res_class ? ch.res_class : broken;
@@ -414,8 +415,8 @@ applyrules(Client *c)
 		{
 			c->isfloating = r->isfloating;
 			c->isfreesize = r->isfreesize;
-      c->isalwaysontop = r->isalwaysontop;
 			c->tags |= r->tags;
+      unmanaged = r->unmanaged;
 			for (m = mons; m && m->num != r->monitor; m = m->next);
 			if (m)
 				c->mon = m;
@@ -1300,6 +1301,14 @@ manage(Window w, XWindowAttributes *wa)
 
 	c = ecalloc(1, sizeof(Client));
 	c->win = w;
+
+  if (getatomprop(c, netatom[NetWMWindowType]) == netatom[NetWMWindowTypeDesktop]) {
+    XMapWindow(dpy, c->win);
+    XLowerWindow(dpy, c->win);
+    free(c);
+    return;
+  }
+
   c->pid = winpid(w);
 	/* geometry */
 	c->x = c->oldx = wa->x;
@@ -1315,6 +1324,17 @@ manage(Window w, XWindowAttributes *wa)
 	} else {
 		c->mon = selmon;
 		applyrules(c);
+	}
+
+	if (unmanaged) {
+		XMapWindow(dpy, c->win);
+		if (unmanaged == 1)
+			XRaiseWindow(dpy, c->win);
+		else if (unmanaged == 2)
+			XLowerWindow(dpy, c->win);
+		free(c);
+		unmanaged = 0;
+		return;
 	}
 
 	if (c->x + WIDTH(c) > c->mon->mx + c->mon->mw)
@@ -2109,16 +2129,6 @@ restack(Monitor *m)
   // create rule to always activate Dunst on the top
   //  XRaiseWindow(dpy, m->sel->win);
 
-	/* raise the aot window */
-	for(Monitor *m_search = mons; m_search; m_search = m_search->next){
-		for(c = m_search->clients; c; c = c->next){
-			if (c->isalwaysontop) {
-				XRaiseWindow(dpy, c->win);
-				break;
-			}
-		}
-	}
-
 	if (m->lt[m->sellt]->arrange) {
 		wc.stack_mode = Below;
 		wc.sibling = m->barwin;
@@ -2476,6 +2486,7 @@ setup(void)
 	netatom[NetWMFullscreen] = XInternAtom(dpy, "_NET_WM_STATE_FULLSCREEN", False);
 	netatom[NetWMWindowType] = XInternAtom(dpy, "_NET_WM_WINDOW_TYPE", False);
 	netatom[NetWMWindowTypeDialog] = XInternAtom(dpy, "_NET_WM_WINDOW_TYPE_DIALOG", False);
+  netatom[NetWMWindowTypeDesktop] = XInternAtom(dpy, "_NET_WM_WINDOW_TYPE_DESKTOP", False);
 	netatom[NetClientList] = XInternAtom(dpy, "_NET_CLIENT_LIST", False);
 	/* init cursors */
 	cursor[CurNormal] = drw_cur_create(drw, XC_left_ptr);
@@ -2787,32 +2798,9 @@ togglefloating(const Arg *arg)
 		selmon->sel->sfy = selmon->sel->y;
 		selmon->sel->sfw = selmon->sel->w;
 		selmon->sel->sfh = selmon->sel->h;
-//    selmon->sel->isalwaysontop = 0; /* disabled, turn this off too */
   }
 	arrange(selmon);
 }
-
-/*void
-togglealwaysontop(const Arg *arg)
-{
-	if (!selmon->sel)
-		return;
-	if (selmon->sel->isfullscreen)
-		return;
-
-	if(selmon->sel->isalwaysontop){
-		selmon->sel->isalwaysontop = 0;
-	}else{
-		// disable others
-		for(Monitor *m = mons; m; m = m->next)
-			for(Client *c = m->clients; c; c = c->next)
-				c->isalwaysontop = 0;
-
-		// turn on, make it float too
-//		selmon->sel->isfloating = 1;
-		selmon->sel->isalwaysontop = 1;
-  }
-}*/
 
 void
 togglefullscr(const Arg *arg)

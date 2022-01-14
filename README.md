@@ -35,6 +35,8 @@
 + [anybar](https://dwm.suckless.org/patches/anybar/)
 + [ipc](https://dwm.suckless.org/patches/ipc/)
 + [riodraw](https://github.com/bakkeby/patches/blob/master/dwm/dwm-riodraw-nopidmatching-6.2.diff)
++ [unmanaged](https://github.com/bakkeby/patches/wiki/unmanaged)
++ [desktop_icons](https://github.com/bakkeby/patches/blob/master/dwm/dwm-desktop_icons-6.3.diff)
 
 ---
 

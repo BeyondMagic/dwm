@@ -13,16 +13,16 @@
 
 
 static const char *menuscript[]			= { "/home/iris/git/scripts/root/rootclick", NULL }; // script to open menu
-static const unsigned int borderpx  = 1;    // border pixel of windows
+static const unsigned int borderpx  = 2;    // border pixel of windows
 static const unsigned int snap      = 3;    // snap pixel
 static const int extrabarright      = 0;    // 1 means extra bar text on right */
 static const char statussep         = ';';  // separator between status bars */
 static const int showbar            = 1;    // 0 means no lemonbar space
 static const int focusonwheel       = 1;    // focus on click or sloppy
-static const unsigned int gappih    = 30;    // horiz inner gap between windows
-static const unsigned int gappiv    = 30;    // vert inner gap between windows
-static const unsigned int gappoh    = 25;    // horiz outer gap between windows and screen edge
-static const unsigned int gappov    = 30;    // vert outer gap between windows and screen edge
+static const unsigned int gappih    = 20;    // horiz inner gap between windows
+static const unsigned int gappiv    = 20;    // vert inner gap between windows
+static const unsigned int gappoh    = 15;    // horiz outer gap between windows and screen edge
+static const unsigned int gappov    = 15;    // vert outer gap between windows and screen edge
 static       int smartgaps          = 0;     // 1 means no outer gap when there is only one window
 static const char slopspawnstyle[]  = "-t 0 -c 0.92,0.85,0.69,0.3 -o"; // do NOT define -f (format) here
 static const char slopresizestyle[] = "-t 0 -c 0.92,0.85,0.69,0.3"; // do NOT define -f (format) here
@@ -73,11 +73,11 @@ static const char *altbarclass      = "Bar";      // Alternate bar class name (B
 
 static const char col_dump[]            = "#222222";
 
-static const char col_flo_sel[]         = "#62A6C3"; // Selected Floating Windows
-static const char col_flo_non[]         = "#395182"; // Floating Windows
+static const char col_flo_sel[]         = "#333333"; // Selected Floating Windows
+static const char col_flo_non[]         = "#ffffff"; // Floating Windows
 
-static const char col_til_sel[]         = "#323234"; // Selected Floating Windows
-static const char col_til_non[]         = "#131115"; // Floating Windows
+static const char col_til_sel[]         = "#ffffff"; // Selected Floating Windows
+static const char col_til_non[]         = "#333333"; // Floating Windows
 
 static const char *colors[][4]      = {
 
@@ -119,214 +119,218 @@ static const char *tags[]           = { "1",  "2",  "3",  "4",  "5",  "6",  "7",
 
 
 static const Rule rules[] = {
-	/* xprop(1):
-	 *	WM_CLASS(STRING) = instance, class
-	 *	WM_NAME(STRING) = title
-	 */
-  
-	// class
-	{ "mpv",
-    //instance
-    NULL,
-    // title
-    NULL,
+  /* xprop(1):
+   *  WM_CLASS(STRING) = instance, class
+   *  WM_NAME(STRING) = title
+   */
+
+  // class
+  { "mpv",NULL,NULL,
     // tags mask
     4,
     // isfloating
     0,
-    // isalwaysontop
-    0,
     // isfreesize
     0,
     // monitor
-    -1 },
+    -1 , 
+    // unmanaged
+    0 },
 
-	// class
-	{ "Dunst",
-    //instance
-    NULL,
-    // title
-    NULL,
+  // class
+  { "Dunst",NULL,NULL,
     // tags mask
     0,
     // isfloating
     1,
-    // isalwaysontop
-    1,
     // isfreesize
     0,
     // monitor
-    -1 },
+    -1 , 
+    // unmanaged
+    0 },
 
-	// class
-	{ "Firefox Beta",
-    //instance
-    NULL,
-    // title
-    NULL,
+  // class
+  { "Navigator",NULL,NULL,
     // tags mask
     1,
     // isfloating
     0,
-    // isalwaysontop
-    0,
     // isfreesize
     0,
     // monitor
-    -1 },
-  
-	// class
-	{ "Gimp",
-    //instance
-    NULL,
-    // title
-    NULL,
+    -1 , 
+    // unmanaged
+    0 },
+
+  // class
+  { "Gimp",NULL,NULL,
     // tags mask
     128,
     // isfloating
     0,
-    // isalwaysontop
-    0,
     // isfreesize
     0,
     // monitor
-    -1 },
+    -1, 
+    // unmanaged
+    0 },
 
-	// class
-	{ "Visualboyadvance-m",
-    //instance
-    NULL,
-    // title
-    NULL,
+  // class
+  { "Visualboyadvance-m",NULL,NULL,
     // tags mask
     32,
     // isfloating
     1,
-    // isalwaysontop
+    // isfreesize
+    0,
+    // monitor
+    -1,
+    // unmanaged
+    0 },
+
+  // title
+  { NULL, NULL, "things_of_life",
+    // tags mask
+    32,
+    // isfloating
+    1,
+    // isfreesize
+    1,
+    // monitor
+    -1,
+    // unmanaged
+    0 },
+
+  // class
+  { "Xsnow",NULL,NULL,
+    // tags mask
+    0,
+    // isfloating
     0,
     // isfreesize
     0,
     // monitor
-    -1 },
-  
-	// class
-	{ "qBittorrent",
-    //instance
-    NULL,
-    // title
-    NULL,
+    -1,
+    // unmanaged
+    2 },
+
+  // class
+  { "GLava",NULL,NULL,
+    // tags mask
+    0,
+    // isfloating
+    0,
+    // isfreesize
+    0,
+    // monitor
+    -1,
+    // unmanaged
+    2 },
+
+  // class
+  { "qBittorrent",NULL,NULL,
     // tags mask
     64,
     // isfloating
-    1,
-    // isalwaysontop
     0,
     // isfreesize
     0,
     // monitor
-    -1 },
+    -1,
+    // unmanaged
+    0 },
 
-	// class
-	{ NULL,
-    //instance
-    NULL,
-    // title
-    "floatst",
+  // title
+  { NULL,NULL,"floatst",
     // tags mask
     0,
     // isfloating
     1,
-    // isalwaysontop
-    0,
     // isfreesize
     0,
     // monitor
-    -1 },
+    -1,
+    // unmanaged
+    0 },
 
-	// class
-	{ "Pavucontrol",
-    //instance
-    NULL,
-    // title
-    NULL,
+  // Class
+  { "St",NULL,NULL,
     // tags mask
     0,
     // isfloating
-    1,
-    // isalwaysontop
-    0,
-    // isfreesize
-    0,
-    // monitor
-    -1 },
-
-	// class
-	{ NULL,
-    //instance
-    NULL,
-    // title
-    "freesizedwm",
-    // tags mask
-    0,
-    // isfloating
-    1,
-    // isalwaysontop
     0,
     // isfreesize
     1,
     // monitor
-    -1 },
-
-	// class
-	{ NULL,
-    //instance
-    NULL,
-    // title
-    "preview_dwm",
-    // tags mask
-    0,
-    // isfloating
-    1,
-    // isalwaysontop
-    0,
-    // isfreesize
-    1,
-    // monitor
-    -1 },
+    -1,
+    // unmanaged
+    0 },
 
   // class
-	{ NULL,
-    //instance
-    NULL,
-    // title
-    "XBindKey: Hit a key",
+  { "Pavucontrol",NULL,NULL,
     // tags mask
     0,
     // isfloating
     1,
-    // isalwaysontop
-    0,
     // isfreesize
     0,
     // monitor
-    -1 },
+    -1  , 
+    // unmanaged
+    0 },
 
-	// class
-	{ "TelegramDesktop",
-    //instance
-    NULL,
-    // title
-    NULL,
+  // Title
+  { NULL,NULL,"freesizedwm",
+    // tags mask
+    0,
+    // isfloating
+    1,
+    // isfreesize
+    1,
+    // monitor
+    -1  , 
+    // unmanaged
+    0 },
+
+  // Title
+  { NULL,NULL,"preview_dwm",
+    // tags mask
+    0,
+    // isfloating
+    1,
+    // isfreesize
+    1,
+    // monitor
+    -1  , 
+    // unmanaged
+    0 },
+
+  // Title
+  { NULL,NULL,"XBindKey: Hit a key",
+    // tags mask
+    0,
+    // isfloating
+    1,
+    // isfreesize
+    0,
+    // monitor
+    -1  , 
+    // unmanaged
+    0 },
+
+  // class
+  { "TelegramDesktop",NULL,NULL,
     // tags mask
     256,
     // isfloating
     0,
-    // isalwaysontop
-    0,
     // isfreesize
     0,
     // monitor
-    -1 },
+    -1  , 
+    // unmanaged
+    0 },
 
 };
 
@@ -559,7 +563,7 @@ static Key keys[] = {
    * Create Window by resizing
    ***************************************************************************************/
 
-	{ ControlMask,                  XK_Return,      riospawn,       {.v = termcmd } },
+	{ MODKEY,                  XK_apostrophe,     riospawn,       {.v = termcmd } },
 //	{ ControlMask,                  XK_BackSpace,      rioresize,      {0} },
 
   /****************************************************************************************
@@ -587,9 +591,9 @@ static Button buttons[] = {
 	 * to control these separately (i.e. to retain the feature to move a tiled window
 	 * into a floating position).
 	 */
-	{ ClkClientWin,         ShiftMask,         Button1,        moveorplace,    {.i = 1} },
-	{ ClkClientWin,         ShiftMask,         Button2,        togglefloating, {0} },
-	{ ClkClientWin,         ShiftMask,         Button3,        resizemouse,    {0} },
+	{ ClkClientWin,         MODKEY,         Button1,        moveorplace,    {.i = 1} },
+	{ ClkClientWin,         MODKEY,         Button2,        togglefloating, {0} },
+	{ ClkClientWin,         MODKEY,         Button3,        resizemouse,    {0} },
 	{ ClkRootWin,						0,							Button3,			  spawn,   {.v = menuscript } },
 ///	{ ClkTagBar,            MODKEY,         Button1,        tag,            {0} },
 //	{ ClkTagBar,            MODKEY,         Button3,        toggletag,      {0} },
