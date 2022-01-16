@@ -2,6 +2,8 @@
 
 #include <stdint.h>
 
+#define ISVISIBLE(C)            ((C->tags & C->mon->tagset[C->mon->seltags]) || C->issticky)
+
 int
 dump_tag(yajl_gen gen, const char *name, const int tag_mask)
 {
@@ -125,6 +127,11 @@ dump_monitor(yajl_gen gen, Monitor *mon, int is_selected)
     )
 
     YSTR("tag_state"); dump_tag_state(gen, mon->tagstate);
+
+    YSTR("tag_clients"); YARR(
+        for (Client* c = mon->clients; c && ISVISIBLE(c); c = c->next)
+          YINT(c->win);
+    )
 
     YSTR("clients"); YMAP(
       YSTR("selected"); YINT(mon->sel ? mon->sel->win : 0);

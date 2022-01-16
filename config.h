@@ -12,7 +12,7 @@
 
 
 
-static const char *menuscript[]			= { "/home/iris/git/scripts/root/rootclick", NULL }; // script to open menu
+static const char *menuscript[]			= { "/home/iris/Git/Projects/creamberry/path/desktop_root_click", NULL }; // script to open menu
 static const unsigned int borderpx  = 2;    // border pixel of windows
 static const unsigned int snap      = 3;    // snap pixel
 static const int extrabarright      = 0;    // 1 means extra bar text on right */
