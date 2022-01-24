@@ -2,7 +2,8 @@
 
 #include <stdint.h>
 
-#define ISVISIBLE(C)            ((C->tags & C->mon->tagset[C->mon->seltags]) || C->issticky)
+//#define IS_VISIBLE(C) ((C->tags & C->mon->tagset[C->mon->seltags]) || C->issticky)
+#define IS_VISIBLE(C) ((C->tags & C->mon->tagset[C->mon->seltags]) || C->issticky)
 
 int
 dump_tag(yajl_gen gen, const char *name, const int tag_mask)
@@ -129,8 +130,9 @@ dump_monitor(yajl_gen gen, Monitor *mon, int is_selected)
     YSTR("tag_state"); dump_tag_state(gen, mon->tagstate);
 
     YSTR("tag_clients"); YARR(
-        for (Client* c = mon->clients; c && ISVISIBLE(c); c = c->next)
-          YINT(c->win);
+        for (Client* c = mon->clients; c; c = c->next)
+          if (IS_VISIBLE(c))
+            YINT(c->win);
     )
 
     YSTR("clients"); YMAP(
@@ -159,7 +161,7 @@ dump_monitor(yajl_gen gen, Monitor *mon, int is_selected)
     YSTR("bar"); YMAP(
       YSTR("y"); YINT(mon->by);
       YSTR("is_shown"); YBOOL(mon->showbar);
-      YSTR("is_top"); YBOOL(mon->topbar);
+      //YSTR("is_top"); YBOOL(mon->topbar);
       YSTR("window_id"); YINT(mon->barwin);
     )
   )

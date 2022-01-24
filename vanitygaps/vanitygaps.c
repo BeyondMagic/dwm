@@ -1,6 +1,6 @@
 /* Key binding functions */
 //static void defaultgaps(const Arg *arg);
-static void incrgaps(const Arg *arg);
+//static void incrgaps(const Arg *arg);
 //static void incrigaps(const Arg *arg);
 //static void incrogaps(const Arg *arg);
 //static void incrohgaps(const Arg *arg);
