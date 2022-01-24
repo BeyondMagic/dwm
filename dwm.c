@@ -2072,8 +2072,13 @@ resizemouse(const Arg *arg)
 			nw = MAX(ev.xmotion.x - ocx - 2 * c->bw + 1, 1);
 			nh = MAX(ev.xmotion.y - ocy - 2 * c->bw + 1, 1);
      	if (!selmon->lt[selmon->sellt]->arrange || c->isfloating)
-//				resize(c, nx, ny, nw, nh, 1);
-				resize(c, c->x, c->y, nw, nh, 1);
+			resize(c, c->x, c->y, nw, nh, 1);
+
+      if (!c->isfloating) {
+        selmon->mfact = (double) (ev.xmotion.x_root - selmon->mx) / (double) selmon->ww;
+  		  arrange(selmon);
+      }
+
 			break;
 		}
 	} while (ev.type != ButtonRelease);
